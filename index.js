@@ -9,11 +9,13 @@ https://sprig.hackclub.com/gallery/getting_started
 */
 /////
 const Player = "p"
+
 const Wall = "w"
+
 const Spike1 = "z"
+const Spike2 = "x"
 
-const SpikeSprites = [Spike1]
-
+const SpikeSprites = [Spike1, Spike2]
 setLegend(
   [ Player, bitmap`
 ................
@@ -49,6 +51,7 @@ setLegend(
 0..............0
 00............00
 0000000000000000` ],
+  
   [ Spike1, bitmap`
 ................
 ................
@@ -65,7 +68,24 @@ setLegend(
 .....000000.....
 ....00000000....
 ...0000000000...
-..000000000000..` ]
+..000000000000..` ],
+  [ Spike2, bitmap`
+................
+................
+................
+................
+................
+................
+................
+..........D.....
+.........DDDD...
+........DD.DDD..
+.DDD..DD44.D4D..
+.D.D444D444.4.44
+.4D.4444444444..
+44D4.4D4D4.D44D.
+44444.44D44....D
+.DDDDDDD4..DDDDD` ],
 )
 setSolids([Player, Wall])
 
@@ -82,15 +102,50 @@ wwwwwwwwww
 wwwwwwwwww`)
 /////
 
+/////
+const RandInt = (max) => {
+  return Math.floor(Math.random() * max)
+}
+/////
+
+let gameTime = 0
+setInterval(() => gameTime += 1, 1000)
+
 const GetPlayer = () => getFirst(Player)
 
-const CheckSpikeCollision = (spr = undefined) => {
+const CheckSpikeCollision = () => {
   const plr = GetPlayer()
-  //todo
+  if (!plr) {return}
+  
+  let sprites = getTile(plr.x, plr.y)
+  if (!sprites) {return}
+
+  sprites = sprites.filter(sprite => SpikeSprites.indexOf(sprite.type) !== -1)
+  if (sprites.length === 0) {return}
+
+  plr.remove()
+  addText(`You lose!\nTime: ${gameTime}s`, {
+    x: 6,
+    y: 7,
+    color: color`3`
+  })
 }
 
 const xBounds = [-1, 9]
 const yBounds = [2, 7]
+
+const CreateSpike = () => addSprite(xBounds[1], yBounds[1], SpikeSprites[RandInt(SpikeSprites.length)])
+
+const createSpike = () =>
+  setTimeout(() => {
+    CreateSpike()
+    createSpike()
+  }, (RandInt(4) * 1000) + 1000)
+
+setTimeout(() => {
+  CreateSpike()
+  createSpike()
+}, 1500)
 
 const TickLevel = () => {
   for (let x = xBounds[0]; x <= xBounds[1]; x++) {
@@ -109,6 +164,8 @@ const TickLevel = () => {
       }
     }
   }
+
+  CheckSpikeCollision()
 }
 
 setInterval(TickLevel, 400)
