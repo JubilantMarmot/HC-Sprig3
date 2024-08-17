@@ -287,6 +287,7 @@ setTimeout(() => {
   createSpike()
 }, 1500)
 
+let tickI
 const TickLevel = () => {
   for (let x = xBounds[0]; x <= xBounds[1]; x++) {
     for (let y = yBounds[0]; y <= yBounds[1]; y++) {
@@ -306,9 +307,21 @@ const TickLevel = () => {
   }
 
   CheckSpikeCollision()
+
+  if (gameTime === 15) {
+    clearInterval(tickI)
+    tickI = setInterval(TickLevel, 500)
+  } else if (gameTime === 60) {
+    clearInterval(tickI)
+    tickI = setInterval(TickLevel, 350)
+  } else if (gameTime === 120) {
+    clearInterval(tickI)
+    tickI = setInterval(TickLevel, 200)
+  }
 }
 
-setInterval(TickLevel, 400)
+
+tickI = setInterval(TickLevel, 600)
 
 let canJump = true
 const JumpPlayer = () => {
