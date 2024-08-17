@@ -12,6 +12,8 @@ const Player = "p"
 const Wall = "w"
 const Spike1 = "z"
 
+const SpikeSprites = [Spike1]
+
 setLegend(
   [ Player, bitmap`
 ................
@@ -65,7 +67,7 @@ setLegend(
 ...0000000000...
 ..000000000000..` ]
 )
-setSolids([Player, Wall, Spike1])
+setSolids([Player, Wall])
 
 setMap(map`
 wwwwwwwwww
@@ -75,33 +77,41 @@ wwwwwwwwww
 ..........
 ..........
 ..........
-p...z.....
+.p..z.....
 wwwwwwwwww
 wwwwwwwwww`)
 /////
 
-const xBounds = [0, 9]
+const GetPlayer = () => getFirst(Player)
+
+const CheckSpikeCollision = (spr = undefined) => {
+  const plr = GetPlayer()
+  //todo
+}
+
+const xBounds = [-1, 9]
 const yBounds = [2, 7]
 
 const TickLevel = () => {
-  for (let x = xBounds[0]; x < xBounds[1]; x++) {
-    for (let y = yBounds[0]; y < yBounds[1]; y++) {
+  for (let x = xBounds[0]; x <= xBounds[1]; x++) {
+    for (let y = yBounds[0]; y <= yBounds[1]; y++) {
       const nextTiles = getTile(x + 1, y + 1)
       if (!nextTiles || nextTiles.length === 0) {continue}
 
       const tile = nextTiles[0]
+      if (SpikeSprites.indexOf(tile.type) === -1) {continue}
+
+      const atEdge = tile.x === xBounds[0] + 1
       tile.x -= 1
 
-      if (tile.x === xBounds[0]) {
-        //tile.remove()
+      if (atEdge && tile.x === xBounds[0] + 1) {
+        tile.remove()
       }
     }
   }
 }
 
-setInterval(TickLevel, 1000)
-
-const GetPlayer = () => getFirst(Player)
+setInterval(TickLevel, 400)
 
 let canJump = true
 const JumpPlayer = () => {
